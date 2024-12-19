@@ -78,12 +78,15 @@ void PlotWindow::processEvents() {
     ImGui::GetIO().DisplaySize = ImVec2((float)display_w, (float)display_h);
 }
 
-void PlotWindow::render() {
+
+void PlotWindow::render(std::function<void()> renderContent) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     
-    // Rendering will be done by DataVisualizer
+    if (renderContent) {
+        renderContent();  // Call visualization within frame scope
+    }
     
     ImGui::Render();
     glClear(GL_COLOR_BUFFER_BIT);

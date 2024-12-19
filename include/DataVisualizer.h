@@ -11,6 +11,8 @@ public:
 private:
     float plotMinY;
     float plotMaxY;
+    float plotMinX;
+    float plotMaxX;
     float markerSize;
     float lineWeight;
     

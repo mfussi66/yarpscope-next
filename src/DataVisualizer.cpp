@@ -5,7 +5,8 @@
 
 DataVisualizer::DataVisualizer()
     : plotMinY(-10.0f), plotMaxY(10.0f),
-      markerSize(6.0f), lineWeight(6.0f) {
+      markerSize(6.0f), lineWeight(6.0f),
+      plotMinX(0.0f), plotMaxX(10.0f) {
 }
 
 void DataVisualizer::render(const std::vector<float>& data, 
@@ -24,15 +25,33 @@ void DataVisualizer::render(const std::vector<float>& data,
     ImGui::End();
 }
 
+void DataVisualizer::updatePlotLimits() {
+    // Create a small window for plot limits controls
+    ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_Once);
+    ImGui::Begin("Plot Limits", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    
+    // Add sliders for Y-axis limits
+    ImGui::SliderFloat("Y Min", &plotMinY, -10000.0f, plotMaxY);
+    ImGui::SliderFloat("Y Max", &plotMaxY, plotMinY, 10000.0f);
+
+    ImGui::SliderFloat("X Min", &plotMinX, 0.0f, plotMaxX);
+    ImGui::SliderFloat("X Max", &plotMaxX, plotMinX, 10000.0f);
+    
+    ImGui::End();
+}
+
 void DataVisualizer::renderPlotControls() {
     ImGui::SliderFloat("Y Min", &plotMinY, -10000.0f, 0.0f);
     ImGui::SliderFloat("Y Max", &plotMaxY, 0.0f, 10000.0f);
-    
+    ImGui::SliderFloat("X Min", &plotMinX, 0.0f, plotMaxX);
+    ImGui::SliderFloat("X Max", &plotMaxX, plotMinX, 10000.0f);
+
     ImGui::SetNextItemWidth(200);
     if (ImGui::SliderFloat("Marker Size", &markerSize, 2.0f, 20.0f)) {
         ImPlot::GetStyle().MarkerSize = markerSize;
+        ImPlot::GetStyle().Marker = ImPlotMarker_Circle;
     }
-    
+
     ImGui::SetNextItemWidth(200);
     if (ImGui::SliderFloat("Line Weight", &lineWeight, 1.0f, 10.0f)) {
         ImPlot::GetStyle().LineWeight = lineWeight;

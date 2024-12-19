@@ -16,20 +16,37 @@ private:
     yarp::os::BufferedPort<yarp::os::Bottle> port;
     std::thread readThread;
     double t0;
+    std::string portPrefix = "/scope_";
+    std::string remotePort = "/in";
+    std::vector<uint16_t> idx = {0};
 
 public:
-    YarpDataReader() : running(true) {
+    YarpDataReader(const std::string & remote, const yarp::os::Bottle & indices) : 
+    running(true), 
+    remotePort(remote) {
         // Initialize YARP network
         static yarp::os::Network yarp;
         if (!yarp.checkNetwork()) {
             throw std::runtime_error("YARP network not available");
         }
 
+        uint8_t port_idx = 0;
         // Open the port
-        if (!port.open("/plot/input")) {
+        if (!port.open(portPrefix + std::to_string(port_idx) + ":i")) {
             throw std::runtime_error("Failed to open port");
         }
 
+        if(!yarp::os::Network::connect(remote, port.getName()))
+        {
+            throw std::runtime_error("Failed to connect to " + remote);
+        }
+
+        for (size_t i = 0; i < indices.size(); i++)
+        {
+            idx.push_back(indices.get(i).asInt16());
+            std::cerr << std::to_string(indices.get(i).asInt16()) << std::endl;
+        }
+        
         // Start the reading thread
         readThread = std::thread([this]() { readLoop(); });
 
@@ -51,7 +68,7 @@ public:
                 std::lock_guard<std::mutex> lock(dataMutex);
                 
                 // Read the first value from the bottle
-                float value = bottle->get(0).asFloat32();
+                float value = bottle->get(idx[0]).asFloat32();
                 float timestamp = yarp::os::Time::now() - t0;
                 
                 data.push_back(value);
