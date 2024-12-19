@@ -1,16 +1,12 @@
-cmake_minimum_required(VERSION 3.10)
-project(sine_wave_plot)
+cmake_minimum_required(VERSION 3.21)
+project(yarpscope-next )
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find required packages
 find_package(OpenGL REQUIRED)
-
-# Add GLFW
 find_package(glfw3 REQUIRED)
-
-
 find_package(YARP REQUIRED)
 
 # Add ImGui source files
@@ -33,28 +29,32 @@ set(IMPLOT_SOURCES
 )
 
 # Add executable
-add_executable(sine_wave_plot 
-    main.cpp
+add_executable(${PROJECT_NAME} 
+    src/main.cpp
+    src/App.cpp
+    src/DataVisualizer.cpp
+    src/PlotWindow.cpp
     ${IMGUI_SOURCES}
     ${IMPLOT_SOURCES}
 )
 
 # Include directories
-target_include_directories(sine_wave_plot PRIVATE
+target_include_directories(${PROJECT_NAME} PRIVATE
     ${IMGUI_DIR}
     ${IMGUI_DIR}/backends
     ${IMPLOT_DIR}
     ${OPENGL_INCLUDE_DIR}
     ${YARP_INCLUDE_DIRS}
+    include/
 )
 
 # Link libraries
-target_link_libraries(sine_wave_plot PRIVATE
+target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     ${OPENGL_LIBRARIES}
     ${YARP_LIBRARIES}
 )
 
 if(UNIX AND NOT APPLE)
-    target_link_libraries(sine_wave_plot PRIVATE GL)
+    target_link_libraries(${PROJECT_NAME} PRIVATE GL)
 endif()
